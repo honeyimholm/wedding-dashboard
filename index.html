@@ -49,7 +49,7 @@ body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--text)}
 .card{background:var(--warm);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 
 /* TASKS (Airtable-powered) */
-.task-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .1s}
 .task-item:last-child{border-bottom:none}
 .task-item:hover{background:#fdf9f5}
 .task-item.done{opacity:.5}
@@ -196,6 +196,7 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
 <nav class="nav">
   <div class="nav-inner">
     <button class="nav-btn" onclick="scrollSec('todos')">✅ Todos</button>
+    <button class="nav-btn" onclick="scrollSec('dri')">🎯 DRI</button>
     <button class="nav-btn" onclick="scrollSec('guests')">👥 Guests</button>
     <button class="nav-btn" onclick="scrollSec('weekend')">📅 Weekend</button>
     <button class="nav-btn" onclick="scrollSec('timeline')">⏱ Day-Of</button>
@@ -225,6 +226,45 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
     <summary>✅ Completed (<span id="doneCount">0</span>)</summary>
     <div class="details-body" id="doneList"></div>
   </details>
+</div>
+
+<!-- DRI -->
+<div class="section" id="dri">
+  <div class="section-head">
+    <div class="section-icon" style="background:#eef4ff">🎯</div>
+    <div class="section-title">Who Owns What</div>
+    <div class="divider"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">Civil ceremony logistics</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#e8f0fe;color:#1a56db;white-space:nowrap">Steffen</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">WhatsApp group — send buddymoon + RSVP nudges</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#e8f0fe;color:#1a56db;white-space:nowrap">Steffen</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">Cocktail hour walk-in song — find + send to DJ</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#e8f0fe;color:#1a56db;white-space:nowrap">Steffen</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">First dance song — send to DJ</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#fdf3cd;color:#856404;white-space:nowrap">Both</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">Speeches — confirm stage + timing with Chrysoula</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#fdf3cd;color:#856404;white-space:nowrap">Both</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">DJ briefing form — music prefs + times</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#fde8e8;color:#c81e1e;white-space:nowrap">Overdue</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--warm)">
+      <div style="flex:1;font-size:13.5px;font-weight:500;color:var(--char)">Tropical house refs for Gerasimos (cocktail set)</div>
+      <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:#e8f0fe;color:#1a56db;white-space:nowrap">Steffen</div>
+    </div>
+  </div>
 </div>
 
 <!-- GUESTS -->
@@ -365,20 +405,31 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
     <div>
       <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Ceremony & Dinner</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="music-block"><div class="music-seg">Before & During Ceremony</div><div class="music-genre">String Quartet</div></div>
-        <div class="music-block"><div class="music-seg">Cocktail / Mini Party</div><div class="music-genre">Saxophone + DJ — Tropical House</div><div class="music-eg">⚠ Walk-in song TBD · Refs TBD for Gerasimos</div></div>
-        <div class="music-block"><div class="music-seg">Dinner</div><div class="music-genre">Bouzouki (1 hr) → Uptempo Pop</div></div>
-        <div class="music-block"><div class="music-seg">First Dance</div><div class="music-genre">⚠ Song not yet sent to DJ</div></div>
-        <div class="music-block"><div class="music-seg">Parents Dance</div><div class="music-genre">⚠ Timing TBD with Chrysoula</div></div>
+        <div class="music-block"><div class="music-seg">Before ceremony</div><div class="music-genre">String Quartet</div></div>
+        <div class="music-block"><div class="music-seg">During ceremony</div><div class="music-genre">String Quartet</div><div class="music-eg">Walk down the aisle — string trio</div></div>
+        <div class="music-block"><div class="music-seg">Mini party entrance</div><div class="music-genre">Saxophone + DJ</div><div class="music-eg">⚠ Coordinate with Chrysoula — lower level dance floor</div></div>
+        <div class="music-block"><div class="music-seg">Cocktail hour</div><div class="music-genre">Saxophone + DJ — Tropical House</div><div class="music-eg">⚠ Walk-in song TBD · ⚠ Send tropical house refs to Gerasimos<br>Portugese pop option: Que Bandeira (Evinha), Lotus 72D</div></div>
+        <div class="music-block"><div class="music-seg">Dinner</div><div class="music-genre">Bouzouki (1 hr) → Uptempo Pop</div><div class="music-eg">Love Me Not — Raven Lenae vibes · then DJ slightly uptempo</div></div>
+        <div class="music-block"><div class="music-seg">First dance</div><div class="music-genre">⚠ Song not yet sent to DJ</div></div>
+        <div class="music-block"><div class="music-seg">Parents dance</div><div class="music-genre">⚠ Timing TBD with Chrysoula</div></div>
+        <div class="music-block"><div class="music-seg">Wedding cake</div><div class="music-genre">⚠ Discuss timing with Chrysoula</div><div class="music-eg">Sparklers? Combine with cake moment?</div></div>
       </div>
     </div>
     <div>
       <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Party (6 hrs)</div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div class="music-block" style="border-left:3px solid #e91e63"><div class="music-seg">9 – 11 PM</div><div class="music-genre">Greek Dancing + Girly Pop</div><div class="music-eg">Greek teaching moment · Beyoncé</div></div>
-        <div class="music-block" style="border-left:3px solid #6200ea"><div class="music-seg">11 PM – 2 AM</div><div class="music-genre">EDM / Latin Pop</div><div class="music-eg">Chainsmokers · Avicii · Bad Bunny · Earth Wind & Fire</div></div>
+        <div class="music-block" style="border-left:3px solid #6200ea"><div class="music-seg">11 PM – 2 AM</div><div class="music-genre">EDM / Latin Pop / Disco</div><div class="music-eg">Chainsmokers · Avicii Levels · Seven Lions Strangers · Bad Bunny · Earth Wind &amp; Fire September</div></div>
         <div class="music-block" style="border-left:3px solid #e53935"><div class="music-seg">2 – 4 AM</div><div class="music-genre">Punk + Latin Throwbacks</div><div class="music-eg">Blink-182 · RHCP · Gasolina · Suavamente</div></div>
       </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:14px 0 10px">Vibes / Inspo</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="music-block"><div class="music-seg">Cocktail / Day 1</div><div class="music-eg">Beach House (Hospital Beach, Cottonwood, Firing Squad)</div></div>
+        <div class="music-block"><div class="music-seg">Contemporary</div><div class="music-eg">Jungle Problemz · Remi Wolf Cinderella · Pyramid ALYSS · Breakcore: Always in One Place (Mindvacy)</div></div>
+        <div class="music-block"><div class="music-seg">Ambient / Floaty</div><div class="music-eg">Big Fun Never Ending Nightmare · Clams Casino · FILO Instrumental</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:14px 0 10px">Fun Moments</div>
+      <div class="music-block"><div class="music-eg">Bridesmaids dance · Groomsmen dance · Hopping on the DJ decks? · Sparkler moment · Circle dance</div></div>
     </div>
   </div>
 </div>
@@ -484,7 +535,7 @@ document.getElementById('daysLeft').textContent = d;
 function scrollSec(id) {
   document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
 }
-const sections = ['todos','guests','weekend','timeline','vendors','music','budget','rings'];
+const sections = ['todos','dri','guests','weekend','timeline','vendors','music','budget','rings'];
 const navBtns = document.querySelectorAll('.nav-btn');
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
@@ -539,9 +590,13 @@ function renderTodos() {
     doneDetails.style.display = 'none';
   }
 
-  // Attach click handlers
-  document.querySelectorAll('.task-item').forEach(el => {
-    el.onclick = () => toggleTodo(el.dataset.id, el.dataset.done === 'true');
+  // Attach click handlers — only the bubble triggers done
+  document.querySelectorAll('.task-checkbox').forEach(cb => {
+    cb.onclick = (e) => {
+      e.stopPropagation();
+      const item = cb.closest('.task-item');
+      toggleTodo(item.dataset.id, item.dataset.done === 'true');
+    };
   });
 }
 
