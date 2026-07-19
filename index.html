@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evi & Steffen — Wedding Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ivory:#faf7f2;--cream:#f4ede0;--warm:#fdfbf8;
+  --gold:#c9a96e;--gold-l:#e8d5b0;--gold-d:#a07840;
+  --char:#2c2825;--text:#3d3530;--muted:#7a6e66;
+  --red:#c0392b;--amber:#d68910;--green:#1e8449;
+  --green-l:#d5f5e3;--amber-l:#fef9e7;--red-l:#fdf0ee;
+  --blue:#2471a3;--blue-l:#eaf4fc;--border:#e8dfd4;
+}
+body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--text)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#2c2825,#3d3530,#4a3f38);color:#faf7f2;padding:48px 24px 40px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a96e' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
+.hero-inner{position:relative;max-width:1100px;margin:0 auto}
+.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:500}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,52px);font-weight:400;line-height:1.1;margin-bottom:6px}
+.hero h1 em{font-style:italic;color:var(--gold-l)}
+.hero-stats{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+.stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);opacity:.8}
+.stat-val{font-size:15px;font-weight:500;color:#faf7f2;margin-top:1px}
+.countdown{display:inline-flex;align-items:center;gap:8px;background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);border-radius:24px;padding:5px 14px;font-size:12px;color:var(--gold-l);margin-top:16px}
+.days{font-weight:700;font-size:17px;color:var(--gold)}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;padding:0 16px}
+.nav-btn{flex-shrink:0;padding:12px 14px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;text-decoration:none;display:inline-block}
+.nav-btn:hover,.nav-btn.active{color:var(--char);border-bottom-color:var(--gold)}
+
+/* CONTENT */
+.container{max-width:1100px;margin:0 auto;padding:32px 16px}
+.section{margin-bottom:48px;scroll-margin-top:50px}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.section-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--char)}
+.divider{flex:1;height:1px;background:var(--border);margin-left:6px;min-width:20px}
+.count-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;background:var(--red);color:#fff;margin-left:5px;vertical-align:middle}
+
+/* CARD */
+.card{background:var(--warm);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+
+/* TASKS (Airtable-powered) */
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.task-item:last-child{border-bottom:none}
+.task-item:hover{background:#fdf9f5}
+.task-item.done{opacity:.5}
+.task-checkbox{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;cursor:pointer}
+.task-item.done .task-checkbox{background:var(--green);border-color:var(--green);color:#fff}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:13.5px;font-weight:500;color:var(--char);line-height:1.4}
+.task-item.done .task-title{text-decoration:line-through;color:var(--muted)}
+.task-sub{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.task-status{flex-shrink:0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--amber-l);color:var(--amber);white-space:nowrap}
+.task-status.in-progress{background:#fff3e6;color:#c46210}
+.task-status.todo{background:var(--amber-l);color:var(--amber)}
+.task-loading{padding:20px;text-align:center;font-size:13px;color:var(--muted)}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* VENDOR CARD */
+.vc{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.vc-cat{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-d);font-weight:600;margin-bottom:3px}
+.vc-name{font-size:14px;font-weight:600;color:var(--char);margin-bottom:2px}
+.vc-detail{font-size:12px;color:var(--muted);line-height:1.5}
+.vc-status{display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-size:11px;font-weight:500}
+.ok{color:var(--green)}.ok::before{content:'✓ '}
+.warn{color:var(--amber)}.warn::before{content:'⚠ '}
+.vc-urgent{border-color:var(--amber);box-shadow:0 0 0 1px rgba(214,137,16,.2)}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:20px}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:var(--border)}
+.tl-item{position:relative;padding:0 0 18px 18px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-23px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--warm);box-shadow:0 0 0 1px var(--gold)}
+.tl-time{font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--gold-d);text-transform:uppercase;margin-bottom:1px}
+.tl-label{font-size:13.5px;font-weight:500;color:var(--char)}
+.tl-note{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+/* EVENTS */
+.ev-card{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.ev-date{flex-shrink:0;width:48px;text-align:center;background:var(--char);color:#faf7f2;border-radius:8px;padding:7px 4px}
+.ev-mo{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--gold)}
+.ev-day{font-size:22px;font-weight:700;line-height:1}
+.ev-title{font-size:13.5px;font-weight:600;color:var(--char)}
+.ev-detail{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+
+/* GUESTS */
+.rsvp-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stat-box{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:80px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;font-family:'Playfair Display',serif;color:var(--char)}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.stat-box.attending .stat-num{color:var(--green)}
+.stat-box.declined .stat-num{color:var(--red)}
+.stat-box.pending .stat-num{color:var(--amber)}
+
+/* COLLAPSIBLE */
+details{margin-bottom:10px}
+summary{cursor:pointer;padding:12px 16px;background:var(--warm);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--char);list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'▸';font-size:12px;color:var(--muted);transition:transform .2s}
+details[open] summary{border-radius:10px 10px 0 0;border-bottom-color:transparent}
+details[open] summary::after{transform:rotate(90deg)}
+.details-body{background:var(--warm);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px}
+.guest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}
+.guest-name{font-size:12px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border)}
+.guest-name:last-child{border-bottom:none}
+
+/* MUSIC */
+.music-block{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.music-seg{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold-d);margin-bottom:3px}
+.music-genre{font-size:13px;font-weight:500;color:var(--char)}
+.music-eg{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+/* PAYMENTS */
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:8px}
+.pay-row:last-child{border-bottom:none}
+.pay-name{font-size:13px;font-weight:500;color:var(--char);flex:1}
+.badge{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;flex-shrink:0}
+.b-done{background:var(--green-l);color:var(--green)}
+.b-pending{background:var(--amber-l);color:var(--amber)}
+
+/* BUDGET */
+.budget-total{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.btot-card{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:120px}
+.btot-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.btot-num{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;color:var(--char)}
+.btot-card.paid .btot-num{color:var(--green)}
+.btot-card.outstanding .btot-num{color:var(--amber)}
+
+/* RING CARDS */
+.ring-card{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.ring-cat{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-d);font-weight:600;margin-bottom:3px}
+.ring-name{font-size:14px;font-weight:600;color:var(--char);margin-bottom:2px}
+.ring-detail{font-size:12px;color:var(--muted);line-height:1.5}
+.ring-link{display:inline-block;margin-top:7px;font-size:11px;font-weight:600;color:var(--blue);text-decoration:none;background:var(--blue-l);padding:3px 10px;border-radius:20px}
+
+/* NOTE BOX */
+.note{background:#fef9f0;border:1px solid #f0d9a0;border-radius:8px;padding:10px 13px;font-size:12px;color:#7a5c10;line-height:1.6;margin-top:10px}
+
+/* SITE CARD */
+.site-card{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* AIRTABLE LINK */
+.at-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);text-decoration:none;margin-left:auto}
+.at-link:hover{color:var(--blue)}
+
+/* FOOTER */
+footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted)}
+
+/* MOBILE */
+@media(max-width:700px){
+  .g2,.g3{grid-template-columns:1fr}
+  .rsvp-stats{gap:8px}
+  .budget-total{gap:10px}
+  .hero-stats{gap:16px}
+  .task-item{gap:10px}
+  .pay-row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:480px){
+  .hero{padding:32px 16px 28px}
+  .container{padding:24px 12px}
+  .vc,.ring-card{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Wedding Dashboard</div>
+    <h1>Evi <em>&</em> Steffen</h1>
+    <div class="hero-stats">
+      <div><div class="stat-label">Wedding Day</div><div class="stat-val">September 18, 2026</div></div>
+      <div><div class="stat-label">Venue</div><div class="stat-val">Island Art & Taste, Athens</div></div>
+      <div><div class="stat-label">Guests</div><div class="stat-val">~131 (±5)</div></div>
+      <div><div class="stat-label">Planner</div><div class="stat-val">Think Happy Events</div></div>
+    </div>
+    <div class="countdown"><span class="days" id="daysLeft">—</span> days to go</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn" onclick="scrollSec('todos')">✅ Todos</button>
+    <button class="nav-btn" onclick="scrollSec('guests')">👥 Guests</button>
+    <button class="nav-btn" onclick="scrollSec('weekend')">📅 Weekend</button>
+    <button class="nav-btn" onclick="scrollSec('timeline')">⏱ Day-Of</button>
+    <button class="nav-btn" onclick="scrollSec('vendors')">✓ Vendors</button>
+    <button class="nav-btn" onclick="scrollSec('music')">🎵 Music</button>
+    <button class="nav-btn" onclick="scrollSec('budget')">💰 Budget</button>
+    <button class="nav-btn" onclick="scrollSec('rings')">💍 Rings</button>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- TODOS (Airtable-powered) -->
+<div class="section" id="todos">
+  <div class="section-head">
+    <div class="section-icon" style="background:#fdf0ee">🔥</div>
+    <div class="section-title">Open Action Items<span class="count-badge" id="todoCount">…</span></div>
+    <div class="divider"></div>
+    <a class="at-link" href="https://airtable.com/appopPTFrHub367wa/tbl7Q6ip6jXr506B4" target="_blank">✎ Edit in Airtable</a>
+  </div>
+
+  <div class="card" id="todoList">
+    <div class="task-loading">Loading todos from Airtable…</div>
+  </div>
+
+  <details id="doneDetails" style="margin-top:12px;display:none">
+    <summary>✅ Completed (<span id="doneCount">0</span>)</summary>
+    <div class="details-body" id="doneList"></div>
+  </details>
+</div>
+
+<!-- GUESTS -->
+<div class="section" id="guests">
+  <div class="section-head">
+    <div class="section-icon" style="background:#e6faf5">👥</div>
+    <div class="section-title">Guest List</div>
+    <div class="divider"></div>
+  </div>
+  <div class="rsvp-stats">
+    <div class="stat-box attending"><div class="stat-num">65</div><div class="stat-lbl">Attending</div></div>
+    <div class="stat-box declined"><div class="stat-num">9</div><div class="stat-lbl">Declined</div></div>
+    <div class="stat-box pending"><div class="stat-num">~57</div><div class="stat-lbl">No Response</div></div>
+    <div class="stat-box"><div class="stat-num">131</div><div class="stat-lbl">Target</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+  <details open>
+    <summary>✅ Attending (65) <span style="color:var(--muted);font-weight:400;font-size:11px">Sep 18 wedding</span></summary>
+    <div class="details-body">
+      <div class="guest-grid">
+        <div class="guest-name">Alex Berman</div><div class="guest-name">Alex Triana</div><div class="guest-name">Amaryllis Bernitsas</div><div class="guest-name">Anja Holm</div><div class="guest-name">Anna Beyko</div><div class="guest-name">Antonis Mergos</div><div class="guest-name">Ariana Nathani</div><div class="guest-name">Arvind Pendurthi</div><div class="guest-name">Arthur de Larroche</div><div class="guest-name">Ashley Kim</div><div class="guest-name">Andrew Schroeder</div><div class="guest-name">Anthony Rueda</div><div class="guest-name">Ben Jang</div><div class="guest-name">Caitlyn Vergara</div><div class="guest-name">Carl Wivel</div><div class="guest-name">Chris Bernitsas</div><div class="guest-name">Chris Kruger</div><div class="guest-name">Christos Bersos</div><div class="guest-name">Davey Hiles</div><div class="guest-name">Dimitri Economou</div><div class="guest-name">Dimitri Varvarezous</div><div class="guest-name">Eleni Beyko</div><div class="guest-name">Elisabeth Holm</div><div class="guest-name">Eric Chow</div><div class="guest-name">Eric Gonzalez</div><div class="guest-name">Erik Torenberg</div><div class="guest-name">Evelyn Reuss</div><div class="guest-name">Freja Wivel Holm</div><div class="guest-name">Hans Hoogland</div><div class="guest-name">Ian Moon</div><div class="guest-name">Ida Wivel</div><div class="guest-name">Ioannis Kremitsas</div><div class="guest-name">Jake Weiss</div><div class="guest-name">Jay Qu</div><div class="guest-name">Jesse Uram</div><div class="guest-name">John Luttig</div><div class="guest-name">Kai Mateo</div><div class="guest-name">Katerina Kontogeorgaki</div><div class="guest-name">Kateryna Romanova</div><div class="guest-name">Katie Williams</div><div class="guest-name">Kingston Lockwood</div><div class="guest-name">Lakis Koniakos</div><div class="guest-name">Lena Parsidou</div><div class="guest-name">Lydia Federico</div><div class="guest-name">Madeleine Casey</div><div class="guest-name">Maro Yuanidis</div><div class="guest-name">Max Braun</div><div class="guest-name">Maya Lassiter</div><div class="guest-name">Meghan Stewart</div><div class="guest-name">Melisa Tokmak</div><div class="guest-name">Micaela Wittman</div><div class="guest-name">Niels Mortensen</div><div class="guest-name">Panos Bernitsas</div><div class="guest-name">Pelina Bernitsa</div><div class="guest-name">Petros Yuanidis</div><div class="guest-name">Prim Phatthanaphong</div><div class="guest-name">Reece S</div><div class="guest-name">Rena Koniakou</div><div class="guest-name">Rosa Wivel</div><div class="guest-name">Rosalie Nathans</div><div class="guest-name">Sam Anagol</div><div class="guest-name">Sarah Jurgens</div><div class="guest-name">TJ Famighetti</div><div class="guest-name">Torben Holm</div><div class="guest-name">Tyler Goulding</div><div class="guest-name">Viky Bersou</div>
+      </div>
+    </div>
+  </details>
+  <details>
+    <summary>❌ Declined (9)</summary>
+    <div class="details-body">
+      <div class="guest-grid">
+        <div class="guest-name">Anna Tahinci</div><div class="guest-name">Aris Candris</div><div class="guest-name">Della Calderon</div><div class="guest-name">Isabella Vergara</div><div class="guest-name">Nicole Katwan</div><div class="guest-name">Stathis Avgoustiniatos</div><div class="guest-name">Steve Calderon</div><div class="guest-name">Tom Kimbrell</div><div class="guest-name">A guest (anonymous)</div>
+      </div>
+    </div>
+  </details>
+  <details>
+    <summary>⏳ No response yet (~57) <span style="color:var(--muted);font-weight:400;font-size:11px">invite or follow up</span></summary>
+    <div class="details-body">
+      <div class="note" style="margin-top:0;margin-bottom:10px">Known in withjoy without RSVP. Plus ~50 more not yet added (Steffen family, Evi's dad's cousins, etc.).</div>
+      <div class="guest-grid">
+        <div class="guest-name">Andrea Caracostis</div><div class="guest-name">Brandon Rogowski</div><div class="guest-name">Clara Petterson</div><div class="guest-name">Iman Khan</div><div class="guest-name">Kostas Caracostis</div><div class="guest-name">Lasse Petterson</div><div class="guest-name">Ranjini Narayan</div>
+      </div>
+    </div>
+  </details>
+  </div>
+</div>
+
+<!-- WEEKEND -->
+<div class="section" id="weekend">
+  <div class="section-head">
+    <div class="section-icon" style="background:#f0f7fd">📅</div>
+    <div class="section-title">The Wedding Weekend</div>
+    <div class="divider"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="ev-card">
+      <div class="ev-date"><div class="ev-mo">Sep</div><div class="ev-day">16</div></div>
+      <div><div class="ev-title">Pre-Wedding Cocktails</div><div class="ev-detail">Akti Restaurant — Athenian Riviera. DJ included with venue. Achilleas attending. Menu audit needed.</div></div>
+    </div>
+    <div class="ev-card">
+      <div class="ev-date"><div class="ev-mo">Sep</div><div class="ev-day">17</div></div>
+      <div><div class="ev-title">Beach Day</div><div class="ev-detail">Krabo — Athenian Riviera (FAVORITE). 10,000€ deposit paid. Achilleas attending.</div></div>
+    </div>
+    <div class="ev-card" style="border-color:var(--gold);box-shadow:0 0 0 1px var(--gold-l)">
+      <div class="ev-date" style="background:linear-gradient(135deg,var(--gold-d),var(--gold))"><div class="ev-mo">Sep</div><div class="ev-day">18</div></div>
+      <div><div class="ev-title" style="font-size:15px">The Wedding ✨</div><div class="ev-detail">Island Art & Taste, Athenian Riviera. ~131 guests. Symbolic ceremony. Sunset 7:08 PM.<br><strong>Ceremony → Cocktails → Dinner → Speeches → Dancing</strong></div></div>
+    </div>
+    <div class="ev-card">
+      <div class="ev-date"><div class="ev-mo">Sep</div><div class="ev-day">21</div></div>
+      <div><div class="ev-title">Buddymoon — Catamaran at Milos</div><div class="ev-detail">Full day catamaran, up to 40 people. Details TBD. Assign who texts whom for invites.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DAY-OF -->
+<div class="section" id="timeline">
+  <div class="section-head">
+    <div class="section-icon" style="background:#f5f0ff">⏱</div>
+    <div class="section-title">Day-Of Timeline — September 18</div>
+    <div class="divider"></div>
+  </div>
+  <div class="card" style="padding:22px 24px">
+    <div class="tl">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">12:00 – 15:00</div><div class="tl-label">Bride's Preparation</div><div class="tl-note">At the private house. George Marasca — hair & makeup.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">15:00 – 16:00</div><div class="tl-label">Bride's Portraits</div><div class="tl-note">Achilleas Colacliides (photo) + George Zorbas (video).</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Ceremony</div><div class="tl-label">Symbolic Ceremony — Upper Level</div><div class="tl-note">String Trio. Friend officiating. Stage TBC with Jim Lebraco.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Cocktail Hour</div><div class="tl-label">Mini Party — Lower Level Dance Floor</div><div class="tl-note">Saxophone + DJ entrance. Tropical house. Walk-in song TBD.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Entrance</div><div class="tl-label">Grand Entrance (in wedding dress)</div><div class="tl-note">High energy + saxophone + champagne.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Dinner</div><div class="tl-label">Greek Buffet → Bouzouki</div><div class="tl-note">Nikos Georgakopoulos (bouzouki, 1 hr). Then uptempo pop.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Speeches</div><div class="tl-label">Speeches</div><div class="tl-note">Stage location TBD (ask Jim Lebraco).</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">First Dance</div><div class="tl-label">First Dance (in wedding dress)</div><div class="tl-note">Song not yet sent. Slow dances follow.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Dessert</div><div class="tl-label">Dessert + Wedding Cake</div><div class="tl-note">Cake design TBD.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Change</div><div class="tl-label">Evi & Steffen Change Outfits</div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#222"></div><div class="tl-time">9 PM – 4 AM</div><div class="tl-label">Dance Floor — 6 Hours</div><div class="tl-note">9–11: Greek + Girly Pop · 11–2: EDM + Latin Pop · 2–4: Punk + Latin Throwbacks</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">Late Night</div><div class="tl-label">Saxophone Encore</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- VENDORS -->
+<div class="section" id="vendors">
+  <div class="section-head">
+    <div class="section-icon" style="background:#fffbf0">📋</div>
+    <div class="section-title">Vendors</div>
+    <div class="divider"></div>
+  </div>
+  <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">⚠ Needs Action</div>
+  <div class="g3" style="margin-bottom:20px">
+    <div class="vc vc-urgent"><div class="vc-cat">DJ</div><div class="vc-name">Gerasimos Konstas</div><div class="vc-detail">Briefing form not yet filled. Respond with times + music prefs.</div><div class="vc-status warn">Form pending</div></div>
+    <div class="vc vc-urgent"><div class="vc-cat">Furniture & Linens</div><div class="vc-name">StyleBox + White Lilac</div><div class="vc-detail">S-tables for 118–126 guests. Payment outstanding.</div><div class="vc-status warn">Payment due</div></div>
+    <div class="vc vc-urgent"><div class="vc-cat">Fireworks</div><div class="vc-name">Aerial Fireworks</div><div class="vc-detail">Quote received Jun 24. Package decision needed.</div><div class="vc-status warn">Decision pending</div></div>
+    <div class="vc vc-urgent"><div class="vc-cat">Sound & Lights</div><div class="vc-name">Island Exclusive Vendor</div><div class="vc-detail">Quote received Jul 6. Mics, sound system, fairy lights.</div><div class="vc-status warn">Awaiting feedback</div></div>
+    <div class="vc vc-urgent"><div class="vc-cat">Musicians</div><div class="vc-name">String Trio / Sax / Bouzouki</div><div class="vc-detail">All booked. Combined payment still outstanding.</div><div class="vc-status warn">Payment due</div></div>
+    <div class="vc vc-urgent"><div class="vc-cat">Steffen's Ring</div><div class="vc-name">Decision + Order Needed</div><div class="vc-detail">Helix Platinum (Frank Darling) or Apollo Green Tourmaline Platinum (Brilliant Earth).</div><div class="vc-status warn">Order not placed</div></div>
+  </div>
+  <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">✓ Confirmed & Booked</div>
+  <div class="g3">
+    <div class="vc"><div class="vc-cat">Wedding Planner</div><div class="vc-name">Think Happy Events</div><div class="vc-detail">Chrysoula. All 3 deposits paid (6,448€).</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Venue & Catering</div><div class="vc-name">Island Art & Taste</div><div class="vc-detail">Greek buffet. 11,840€ deposit paid.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Photographer</div><div class="vc-name">Achilleas Colacliides</div><div class="vc-detail">Sep 16, 17, 18. 1,240€ deposit paid.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Videographer</div><div class="vc-name">George Zorbas</div><div class="vc-detail">2,604€ deposit. Agreement signed.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Hair & Makeup</div><div class="vc-name">George Marasca</div><div class="vc-detail">372€ deposit paid.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Florist / Decorator</div><div class="vc-name">Jim Labrako</div><div class="vc-detail">3,390€ deposit paid.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">String Trio</div><div class="vc-name">Violin, Viola & Cello</div><div class="vc-detail">€1,300 + VAT, up to 2 hours.</div><div class="vc-status ok">Booked</div></div>
+    <div class="vc"><div class="vc-cat">Saxophone</div><div class="vc-name">Giannis Karanasios</div><div class="vc-detail">1,000€ + VAT, up to 2 hours.</div><div class="vc-status ok">Booked</div></div>
+    <div class="vc"><div class="vc-cat">Bouzouki</div><div class="vc-name">Nikos Georgakopoulos</div><div class="vc-detail">Dinner hour, 1 hour.</div><div class="vc-status ok">Booked</div></div>
+    <div class="vc"><div class="vc-cat">Pre-Wedding Sep 16</div><div class="vc-name">Akti Restaurant</div><div class="vc-detail">Athenian Riviera. Menu audit needed.</div><div class="vc-status ok">Booked</div></div>
+    <div class="vc"><div class="vc-cat">Beach Day Sep 17</div><div class="vc-name">Krabo Restaurant</div><div class="vc-detail">FAVORITE. 10,000€ deposit paid.</div><div class="vc-status ok">Paid</div></div>
+    <div class="vc"><div class="vc-cat">Evi's Wedding Band</div><div class="vc-name">Already Ordered ✓</div><div class="vc-detail">Evi's ring confirmed and ordered.</div><div class="vc-status ok">Done</div></div>
+  </div>
+</div>
+
+<!-- MUSIC -->
+<div class="section" id="music">
+  <div class="section-head">
+    <div class="section-icon" style="background:#fff0f5">🎵</div>
+    <div class="section-title">Music Plan</div>
+    <div class="divider"></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Ceremony & Dinner</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="music-block"><div class="music-seg">Before & During Ceremony</div><div class="music-genre">String Quartet</div></div>
+        <div class="music-block"><div class="music-seg">Cocktail / Mini Party</div><div class="music-genre">Saxophone + DJ — Tropical House</div><div class="music-eg">⚠ Walk-in song TBD · Refs TBD for Gerasimos</div></div>
+        <div class="music-block"><div class="music-seg">Dinner</div><div class="music-genre">Bouzouki (1 hr) → Uptempo Pop</div></div>
+        <div class="music-block"><div class="music-seg">First Dance</div><div class="music-genre">⚠ Song not yet sent to DJ</div></div>
+        <div class="music-block"><div class="music-seg">Parents Dance</div><div class="music-genre">⚠ Timing TBD with Chrysoula</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Party (6 hrs)</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="music-block" style="border-left:3px solid #e91e63"><div class="music-seg">9 – 11 PM</div><div class="music-genre">Greek Dancing + Girly Pop</div><div class="music-eg">Greek teaching moment · Beyoncé</div></div>
+        <div class="music-block" style="border-left:3px solid #6200ea"><div class="music-seg">11 PM – 2 AM</div><div class="music-genre">EDM / Latin Pop</div><div class="music-eg">Chainsmokers · Avicii · Bad Bunny · Earth Wind & Fire</div></div>
+        <div class="music-block" style="border-left:3px solid #e53935"><div class="music-seg">2 – 4 AM</div><div class="music-genre">Punk + Latin Throwbacks</div><div class="music-eg">Blink-182 · RHCP · Gasolina · Suavamente</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET -->
+<div class="section" id="budget">
+  <div class="section-head">
+    <div class="section-icon" style="background:#f0fff4">💰</div>
+    <div class="section-title">Budget</div>
+    <div class="divider"></div>
+  </div>
+  <div class="budget-total">
+    <div class="btot-card paid"><div class="btot-label">Deposits Paid</div><div class="btot-num">35,894€</div></div>
+    <div class="btot-card outstanding"><div class="btot-label">Outstanding (TBD)</div><div class="btot-num">TBD</div></div>
+  </div>
+  <div class="card" style="padding:0 18px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:12px 0 6px">Confirmed Deposits</div>
+    <div class="pay-row"><div class="pay-name">Island Art & Taste (venue)</div><span class="badge b-done">11,840€</span></div>
+    <div class="pay-row"><div class="pay-name">Krabo Beach Day (Sep 17)</div><span class="badge b-done">10,000€</span></div>
+    <div class="pay-row"><div class="pay-name">Think Happy Events (3 deposits)</div><span class="badge b-done">6,448€</span></div>
+    <div class="pay-row"><div class="pay-name">George Zorbas (video)</div><span class="badge b-done">2,604€</span></div>
+    <div class="pay-row"><div class="pay-name">Jim Labrako (florist)</div><span class="badge b-done">3,390€</span></div>
+    <div class="pay-row"><div class="pay-name">Achilleas Colacliides (photo)</div><span class="badge b-done">1,240€</span></div>
+    <div class="pay-row"><div class="pay-name">George Marasca (hair & makeup)</div><span class="badge b-done">372€</span></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:12px 0 6px">Still Owed</div>
+    <div class="pay-row"><div class="pay-name">StyleBox + White Lilac (furniture)</div><span class="badge b-pending">TBD</span></div>
+    <div class="pay-row"><div class="pay-name">Musicians — final balances (Trio, Sax, Bouzouki)</div><span class="badge b-pending">TBD</span></div>
+    <div class="pay-row"><div class="pay-name">Sound & Lights</div><span class="badge b-pending">TBD</span></div>
+    <div class="pay-row"><div class="pay-name">Fireworks package</div><span class="badge b-pending">TBD</span></div>
+    <div class="pay-row"><div class="pay-name">Final venue balances (Island, Krabo, Akti)</div><span class="badge b-pending">TBD</span></div>
+    <div class="pay-row"><div class="pay-name">Steffen's wedding ring</div><span class="badge b-pending">TBD</span></div>
+  </div>
+  <div class="note" style="margin-top:10px">Full budget breakdown in your <a href="https://docs.google.com/spreadsheets/d/1Td9lWDzcfssZl_88jEAxhEUT6JphK9zPYRs7hwICTAk" target="_blank" style="color:var(--gold-d)">Wedding Payment spreadsheet</a>.</div>
+</div>
+
+<!-- RINGS -->
+<div class="section" id="rings">
+  <div class="section-head">
+    <div class="section-icon" style="background:#fdf5ff">💍</div>
+    <div class="section-title">Wedding Rings</div>
+    <div class="divider"></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:10px">Evi's Ring — ✓ Ordered</div>
+      <div class="ring-card" style="border-color:var(--green);opacity:.85">
+        <div class="ring-cat">Evi's Wedding Band</div>
+        <div class="ring-name">Already Ordered ✓</div>
+        <div class="ring-detail">Evi's ring has been ordered and confirmed.</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:10px">Steffen's Ring — ⚠ Still Deciding</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="ring-card" style="border-color:var(--gold)">
+          <div class="ring-cat">Option 1 — Leaning Toward</div>
+          <div class="ring-name">Frank Darling — The Helix</div>
+          <div class="ring-detail">Textured top band. Platinum. Clean and distinctive.</div>
+          <a class="ring-link" href="https://frankdarling.com/wedding-rings/the-helix/?colorkey=PL" target="_blank">View on Frank Darling →</a>
+        </div>
+        <div class="ring-card">
+          <div class="ring-cat">Option 2</div>
+          <div class="ring-name">Brilliant Earth — Apollo Green Tourmaline</div>
+          <div class="ring-detail">4.5mm, Platinum, green tourmaline inlay.</div>
+          <a class="ring-link" href="https://www.brilliantearth.com/Apollo-Green-Tourmaline-4.5mm-Wedding-Ring-Platinum-BE2GT142/" target="_blank">View on Brilliant Earth →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEBSITE -->
+<div class="section">
+  <div class="section-head">
+    <div class="section-icon" style="background:#f0f7ff">🌐</div>
+    <div class="section-title">Wedding Website</div>
+    <div class="divider"></div>
+  </div>
+  <div class="site-card">
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:600;color:var(--char)">eviandsteffen.ai</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">Password: <code style="background:#f0ede8;padding:1px 5px;border-radius:3px">stevi</code> · Design: "Painted Beach"</div>
+    </div>
+    <a href="https://eviandsteffen.ai" target="_blank" style="font-size:12px;font-weight:600;color:var(--blue);text-decoration:none;border:1px solid var(--blue-l);padding:6px 14px;border-radius:20px;background:var(--blue-l)">Visit →</a>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>Updated July 2026 · Todos powered by Airtable · Sources: Obsidian, Think Happy Events, Gmail, withjoy.com</footer>
+
+<script>
+// ─── CONFIG ─────────────────────────────────────────────────────────
+const AT_TOKEN = 'pattdNjpLBLDmjmtE.' + '0587ae706a0f143008c45c5' + '83db3c98b43d3834f5576fe585390928e5b007c5a';
+const BASE_ID = 'appopPTFrHub367wa';
+const TABLE = 'Table%201';
+
+// ─── COUNTDOWN ──────────────────────────────────────────────────────
+const d = Math.ceil((new Date('2026-09-18') - new Date().setHours(0,0,0,0)) / 86400000);
+document.getElementById('daysLeft').textContent = d;
+
+// ─── NAV SCROLL + ACTIVE ────────────────────────────────────────────
+function scrollSec(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+const sections = ['todos','guests','weekend','timeline','vendors','music','budget','rings'];
+const navBtns = document.querySelectorAll('.nav-btn');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const i = sections.indexOf(e.target.id);
+      navBtns.forEach((b,j) => b.classList.toggle('active', j===i));
+    }
+  });
+}, {rootMargin:'-50px 0px -70% 0px'});
+sections.forEach(id => { const el = document.getElementById(id); if(el) obs.observe(el); });
+
+// ─── AIRTABLE TODOS ─────────────────────────────────────────────────
+let allRecords = [];
+
+async function loadTodos() {
+  try {
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE}?sort[0][field]=Name&sort[0][direction]=asc`;
+    const resp = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + AT_TOKEN }
+    });
+    const data = await resp.json();
+    allRecords = data.records || [];
+    renderTodos();
+  } catch(e) {
+    document.getElementById('todoList').innerHTML = '<div class="task-loading">Error loading todos. Check your connection.</div>';
+  }
+}
+
+function renderTodos() {
+  const open = allRecords.filter(r => r.fields.Status !== 'Done');
+  const done = allRecords.filter(r => r.fields.Status === 'Done');
+
+  // Open count badge
+  document.getElementById('todoCount').textContent = open.length;
+
+  // Open todos
+  const listEl = document.getElementById('todoList');
+  if (open.length === 0) {
+    listEl.innerHTML = '<div class="task-loading">🎉 All done!</div>';
+  } else {
+    listEl.innerHTML = open.map(r => renderTask(r, false)).join('');
+  }
+
+  // Done section
+  const doneEl = document.getElementById('doneList');
+  const doneDetails = document.getElementById('doneDetails');
+  document.getElementById('doneCount').textContent = done.length;
+  if (done.length > 0) {
+    doneDetails.style.display = 'block';
+    doneEl.innerHTML = done.map(r => renderTask(r, true)).join('');
+  } else {
+    doneDetails.style.display = 'none';
+  }
+
+  // Attach click handlers
+  document.querySelectorAll('.task-item').forEach(el => {
+    el.onclick = () => toggleTodo(el.dataset.id, el.dataset.done === 'true');
+  });
+}
+
+function renderTask(r, isDone) {
+  const status = r.fields.Status || 'Todo';
+  const statusLabel = status === 'In progress' ? 'In Progress' : status;
+  const statusClass = status === 'In progress' ? 'in-progress' : 'todo';
+  const check = isDone ? '✓' : '';
+  return `<div class="task-item${isDone?' done':''}" data-id="${r.id}" data-done="${isDone}">
+    <div class="task-checkbox">${check}</div>
+    <div class="task-body">
+      <div class="task-title">${escHtml(r.fields.Name || '')}</div>
+      ${r.fields.Notes ? `<div class="task-sub">${escHtml(r.fields.Notes)}</div>` : ''}
+    </div>
+    ${!isDone ? `<div class="task-status ${statusClass}">${statusLabel}</div>` : ''}
+  </div>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function toggleTodo(recordId, isDone) {
+  const newStatus = isDone ? 'Todo' : 'Done';
+  try {
+    await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE}/${recordId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'Bearer ' + AT_TOKEN,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fields: { Status: newStatus } })
+    });
+    // Optimistically update local state
+    const rec = allRecords.find(r => r.id === recordId);
+    if (rec) rec.fields.Status = newStatus;
+    renderTodos();
+  } catch(e) {
+    console.error('Failed to update todo:', e);
+  }
+}
+
+// Load todos on page load
+loadTodos();
+</script>
+</body>
+</html>
