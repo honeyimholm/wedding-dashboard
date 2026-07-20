@@ -65,6 +65,27 @@ body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--text)}
 .task-link:hover{text-decoration:underline}
 .task-sec-link{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:600;color:var(--muted);text-decoration:none;background:var(--warm);border:1px solid var(--border);padding:1px 8px;border-radius:10px}
 .task-sec-link:hover{color:var(--blue);border-color:var(--blue)}
+/* EDIT MODE */
+.edit-btn{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1.5px solid var(--muted);background:transparent;color:var(--muted);cursor:pointer;margin-left:auto;flex-shrink:0}
+.edit-btn.active{border-color:var(--blue);color:var(--blue);background:#eef3ff}
+#todoList.edit-mode .task-item:not(.done){cursor:pointer}
+#todoList.edit-mode .task-item:not(.done):hover{background:#f0f4ff;border-radius:8px}
+.add-task-btn{display:flex;align-items:center;gap:6px;width:100%;padding:11px 14px;border:none;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;border-top:1px solid var(--border);text-align:left}
+.add-task-btn:hover{color:var(--blue);background:#f7f9ff}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:14px;padding:22px 20px 18px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-title{font-size:15px;font-weight:700;color:var(--char);margin-bottom:14px}
+.modal label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;margin-top:12px}
+.modal-input,.modal-select,.modal-textarea{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13px;color:var(--char);font-family:inherit;outline:none;box-sizing:border-box;background:#fff}
+.modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--blue)}
+.modal-textarea{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;align-items:center}
+.modal-cancel{padding:7px 14px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.modal-save{padding:7px 16px;border-radius:7px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.modal-save:hover{opacity:.88}
+.modal-save:disabled{opacity:.5;cursor:default}
+.modal-delete{padding:7px 12px;border-radius:7px;border:1.5px solid #fca5a5;background:transparent;color:#dc2626;font-size:13px;font-weight:600;cursor:pointer;margin-right:auto}
 .task-status{flex-shrink:0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--amber-l);color:var(--amber);white-space:nowrap}
 .task-status.in-progress{background:#fff3e6;color:#c46210}
 .task-status.todo{background:var(--amber-l);color:var(--amber)}
@@ -220,13 +241,14 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
     <div class="section-icon" style="background:#fdf0ee">🔥</div>
     <div class="section-title">Open Action Items<span class="count-badge" id="todoCount">…</span></div>
     <div class="divider"></div>
-    <a class="at-link" href="https://airtable.com/appopPTFrHub367wa/tbl7Q6ip6jXr506B4" target="_blank">✎ Edit in Airtable</a>
+    <button class="edit-btn" id="editModeBtn" onclick="toggleEditMode()">✎ Edit</button>
   </div>
 
   <div class="card" style="padding:0">
     <div id="todoList">
       <div class="task-loading">Loading todos from Airtable…</div>
     </div>
+    <button class="add-task-btn" onclick="openAddModal()">＋ Add item</button>
   </div>
 
   <details id="doneDetails" style="margin-top:12px;display:none">
@@ -455,7 +477,7 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
         <div class="ring-card" style="border-color:var(--gold)">
           <div class="ring-cat">Option 1 — Leaning Toward</div>
           <div class="ring-name">Frank Darling — The Helix</div>
-          <div class="ring-detail">Textured top band. Platinum. Clean and distinctive.</div>
+          <div class="ring-detail">Textured top band. Platinum. Clean and distinctive. ✉️ Emailed to arrange an in-store try-on — appointment pending.</div>
           <a class="ring-link" href="https://frankdarling.com/wedding-rings/the-helix/?colorkey=PL" target="_blank">View on Frank Darling →</a>
         </div>
         <div class="ring-card">
@@ -651,6 +673,134 @@ async function toggleTodo(recordId, isDone) {
 
 // Load todos on page load
 loadTodos();
+
+// ─── EDIT MODE & MODAL ──────────────────────────────────────────────
+let editMode = false;
+let modalRecordId = null;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  const btn = document.getElementById('editModeBtn');
+  const list = document.getElementById('todoList');
+  btn.classList.toggle('active', editMode);
+  btn.textContent = editMode ? '✓ Done' : '✎ Edit';
+  list.classList.toggle('edit-mode', editMode);
+}
+
+// Event delegation — single listener on todoList catches clicks in edit mode
+document.getElementById('todoList').addEventListener('click', e => {
+  if (!editMode) return;
+  const item = e.target.closest('.task-item');
+  if (!item || item.dataset.done === 'true') return;
+  if (e.target.closest('.task-checkbox') || e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+  openEditModal(item.dataset.id);
+});
+
+function openEditModal(recordId) {
+  const rec = allRecords.find(r => r.id === recordId);
+  if (!rec) return;
+  modalRecordId = recordId;
+  document.getElementById('modalTitle').textContent = 'Edit Task';
+  document.getElementById('modalName').value = rec.fields.Name || '';
+  document.getElementById('modalStatus').value = rec.fields.Status || 'Todo';
+  document.getElementById('modalNotes').value = rec.fields.Notes || '';
+  document.getElementById('modalDelete').style.display = 'inline-block';
+  document.getElementById('taskModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('modalName').focus(), 50);
+}
+
+function openAddModal() {
+  modalRecordId = null;
+  document.getElementById('modalTitle').textContent = 'New Task';
+  document.getElementById('modalName').value = '';
+  document.getElementById('modalStatus').value = 'Todo';
+  document.getElementById('modalNotes').value = '';
+  document.getElementById('modalDelete').style.display = 'none';
+  document.getElementById('taskModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('modalName').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('taskModal').style.display = 'none';
+  modalRecordId = null;
+}
+
+async function saveModal() {
+  const name = document.getElementById('modalName').value.trim();
+  if (!name) { document.getElementById('modalName').focus(); return; }
+  const status = document.getElementById('modalStatus').value;
+  const notes = document.getElementById('modalNotes').value.trim();
+  const saveBtn = document.getElementById('modalSaveBtn');
+  saveBtn.textContent = 'Saving…';
+  saveBtn.disabled = true;
+  try {
+    if (modalRecordId) {
+      const resp = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE}/${modalRecordId}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + AT_TOKEN, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { Name: name, Status: status, Notes: notes } })
+      });
+      const data = await resp.json();
+      const idx = allRecords.findIndex(r => r.id === modalRecordId);
+      if (idx >= 0) allRecords[idx] = data;
+    } else {
+      const resp = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE}`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + AT_TOKEN, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { Name: name, Status: status, Notes: notes } })
+      });
+      const data = await resp.json();
+      allRecords.push(data);
+    }
+    closeModal();
+    renderTodos();
+    if (editMode) {
+      document.getElementById('todoList').classList.add('edit-mode');
+    }
+  } catch(err) {
+    console.error('Save failed:', err);
+    saveBtn.textContent = 'Error — retry';
+  } finally {
+    saveBtn.disabled = false;
+    if (saveBtn.textContent === 'Saving…') saveBtn.textContent = 'Save';
+  }
+}
+
+async function deleteTask() {
+  if (!modalRecordId || !confirm('Delete this task?')) return;
+  try {
+    await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE}/${modalRecordId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + AT_TOKEN }
+    });
+    allRecords = allRecords.filter(r => r.id !== modalRecordId);
+    closeModal();
+    renderTodos();
+  } catch(err) {
+    console.error('Delete failed:', err);
+  }
+}
 </script>
+
+<!-- TASK MODAL -->
+<div id="taskModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Edit Task</div>
+    <label>Name</label>
+    <input id="modalName" type="text" class="modal-input" placeholder="Task name…" onkeydown="if(event.key==='Enter')saveModal()" />
+    <label>Status</label>
+    <select id="modalStatus" class="modal-select">
+      <option value="Todo">Todo</option>
+      <option value="In progress">In progress</option>
+    </select>
+    <label>Notes</label>
+    <textarea id="modalNotes" class="modal-textarea" placeholder="Optional notes or links…"></textarea>
+    <div class="modal-actions">
+      <button id="modalDelete" class="modal-delete" onclick="deleteTask()" style="display:none">Delete</button>
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button id="modalSaveBtn" class="modal-save" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
