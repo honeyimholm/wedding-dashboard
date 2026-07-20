@@ -63,6 +63,8 @@ body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--text)}
 .task-dri-pill{display:inline-block;font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:#e8f0fe;color:#1a56db;letter-spacing:.01em}
 .task-link{color:#1a56db;font-weight:600;font-size:10.5px;text-decoration:none}
 .task-link:hover{text-decoration:underline}
+.task-sec-link{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:600;color:var(--muted);text-decoration:none;background:var(--warm);border:1px solid var(--border);padding:1px 8px;border-radius:10px}
+.task-sec-link:hover{color:var(--blue);border-color:var(--blue)}
 .task-status{flex-shrink:0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--amber-l);color:var(--amber);white-space:nowrap}
 .task-status.in-progress{background:#fff3e6;color:#c46210}
 .task-status.todo{background:var(--amber-l);color:var(--amber)}
@@ -462,6 +464,24 @@ footer{text-align:center;padding:32px 16px 48px;font-size:11px;color:var(--muted
           <div class="ring-detail">4.5mm, Platinum, green tourmaline inlay.</div>
           <a class="ring-link" href="https://www.brilliantearth.com/Apollo-Green-Tourmaline-4.5mm-Wedding-Ring-Platinum-BE2GT142/" target="_blank">View on Brilliant Earth →</a>
         </div>
+        <div class="ring-card">
+          <div class="ring-cat">Option 3 — Geometric / Textured</div>
+          <div class="ring-name">Tiffany True® Band Ring</div>
+          <div class="ring-detail">Platinum. 4mm wide. Signature geometric faceted profile — clean angles, modern structure.</div>
+          <a class="ring-link" href="https://www.tiffany.com/jewelry/rings/tiffany-true-platinum-rings-68651921.html" target="_blank">View on Tiffany →</a>
+        </div>
+        <div class="ring-card">
+          <div class="ring-cat">Option 4 — Geometric / Faceted</div>
+          <div class="ring-name">TACORI — Geometric Faceted Satin Band</div>
+          <div class="ring-detail">Platinum. Multi-facet cut surfaces with satin finish — angular and tactile without being busy.</div>
+          <a class="ring-link" href="https://www.tacori.com/wedding-ring-geometric-147-satin/" target="_blank">View on TACORI →</a>
+        </div>
+        <div class="ring-card">
+          <div class="ring-cat">Option 5 — Sculpted Texture</div>
+          <div class="ring-name">TACORI — Sculpted Texture Band</div>
+          <div class="ring-detail">Platinum. Dimensional sculpted pattern across the full band — more organic texture than classic smooth.</div>
+          <a class="ring-link" href="https://www.tacori.com/wedding-ring-geometric-170b/" target="_blank">View on TACORI →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -570,18 +590,26 @@ const TASK_DRI = {
   'rec9ecUv64lkNv6cx': 'Steffen', // Civil ceremony — call SF County Clerk
 };
 
+const TASK_SECTION = {
+  'recIOsj3lIR3RRjDe': { id: 'rings',   label: 'Rings' },   // Wedding band — place order
+  'recm9VQkWY5CUedEs': { id: 'vendors', label: 'Vendors' }, // Pay Stylebox + Musicians
+  'recJwZlA6NuxhslQS': { id: 'vendors', label: 'Vendors' }, // Vendor payments
+};
+
 function renderTask(r, isDone) {
   const status = r.fields.Status || 'Todo';
   const statusLabel = status === 'In progress' ? 'In Progress' : status;
   const statusClass = status === 'In progress' ? 'in-progress' : 'todo';
   const check = isDone ? '✓' : '';
   const dri = r.fields.DRI || TASK_DRI[r.id] || '';
+  const sec = TASK_SECTION[r.id];
   return `<div class="task-item${isDone?' done':''}" data-id="${r.id}" data-done="${isDone}">
     <div class="task-checkbox">${check}</div>
     <div class="task-body">
       <div class="task-title">${escHtml(r.fields.Name || '')}</div>
       ${r.fields.Notes ? `<div class="task-sub">${renderNotes(r.fields.Notes)}</div>` : ''}
       ${dri ? `<div class="task-dri">DRI <span class="task-dri-pill">${escHtml(dri)}</span></div>` : ''}
+      ${sec ? `<a class="task-sec-link" href="#" onclick="event.stopPropagation();scrollSec('${sec.id}');return false;">→ ${sec.label}</a>` : ''}
     </div>
     ${!isDone ? `<div class="task-status ${statusClass}">${statusLabel}</div>` : ''}
   </div>`;
