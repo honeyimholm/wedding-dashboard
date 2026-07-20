@@ -608,9 +608,13 @@ function renderTodos() {
   });
 }
 
-const TASK_DRI = {
+const TASK_DRI = Object.assign({
   'rec9ecUv64lkNv6cx': 'Steffen', // Civil ceremony — call SF County Clerk
-};
+}, JSON.parse(localStorage.getItem('taskDri') || '{}'));
+
+function saveDriStore() {
+  localStorage.setItem('taskDri', JSON.stringify(TASK_DRI));
+}
 
 const TASK_SECTION = {
   'recIOsj3lIR3RRjDe': { id: 'rings',   label: 'Rings' },   // Wedding band — place order
@@ -704,6 +708,7 @@ function openEditModal(recordId) {
   document.getElementById('modalName').value = rec.fields.Name || '';
   document.getElementById('modalStatus').value = rec.fields.Status || 'Todo';
   document.getElementById('modalNotes').value = rec.fields.Notes || '';
+  document.getElementById('modalDri').value = TASK_DRI[recordId] || '';
   document.getElementById('modalDelete').style.display = 'inline-block';
   document.getElementById('taskModal').style.display = 'flex';
   setTimeout(() => document.getElementById('modalName').focus(), 50);
@@ -714,6 +719,7 @@ function openAddModal() {
   document.getElementById('modalTitle').textContent = 'New Task';
   document.getElementById('modalName').value = '';
   document.getElementById('modalStatus').value = 'Todo';
+  document.getElementById('modalDri').value = '';
   document.getElementById('modalNotes').value = '';
   document.getElementById('modalDelete').style.display = 'none';
   document.getElementById('taskModal').style.display = 'flex';
@@ -730,6 +736,7 @@ async function saveModal() {
   if (!name) { document.getElementById('modalName').focus(); return; }
   const status = document.getElementById('modalStatus').value;
   const notes = document.getElementById('modalNotes').value.trim();
+  const dri = document.getElementById('modalDri').value;
   const saveBtn = document.getElementById('modalSaveBtn');
   saveBtn.textContent = 'Saving…';
   saveBtn.disabled = true;
@@ -743,6 +750,9 @@ async function saveModal() {
       const data = await resp.json();
       const idx = allRecords.findIndex(r => r.id === modalRecordId);
       if (idx >= 0) allRecords[idx] = data;
+      // Save DRI locally
+      if (dri) { TASK_DRI[modalRecordId] = dri; } else { delete TASK_DRI[modalRecordId]; }
+      saveDriStore();
     } else {
       const resp = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE}`, {
         method: 'POST',
@@ -751,6 +761,8 @@ async function saveModal() {
       });
       const data = await resp.json();
       allRecords.push(data);
+      // Save DRI locally for new record
+      if (dri && data.id) { TASK_DRI[data.id] = dri; saveDriStore(); }
     }
     closeModal();
     renderTodos();
@@ -792,6 +804,12 @@ async function deleteTask() {
     <select id="modalStatus" class="modal-select">
       <option value="Todo">Todo</option>
       <option value="In progress">In progress</option>
+    </select>
+    <label>DRI</label>
+    <select id="modalDri" class="modal-select">
+      <option value="">— none —</option>
+      <option value="Steffen">Steffen</option>
+      <option value="Evi">Evi</option>
     </select>
     <label>Notes</label>
     <textarea id="modalNotes" class="modal-textarea" placeholder="Optional notes or links…"></textarea>
